@@ -7,8 +7,6 @@ pub mod generator;
 
 #[async_trait]
 pub trait Task<I>: Generator<I> {
-    type Generator;
-
     async fn submit(&self, client: &Client) -> Result<()>;
 
     fn id(&self) -> &serde_json::Number;

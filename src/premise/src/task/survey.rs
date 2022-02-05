@@ -21,8 +21,6 @@ pub struct Survey(pub serde_json::Number);
 
 #[async_trait]
 impl<'a> super::Task<&'a Vec<&'a InputGroup>> for Survey {
-    type Generator = fn(&'a Vec<&'a group::input::InputGroup>) -> HashMap<&'a String, Value>;
-
     async fn submit(&self, client: &Client) -> result::Result<()> {
         let reserved_task = client.user.reserve(self.id().clone()).await?.reserved_tasks
             .into_iter().next().unwrap_or({
