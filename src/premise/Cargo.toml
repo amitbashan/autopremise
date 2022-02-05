@@ -1,0 +1,19 @@
+[package]
+name = "premise"
+authors = ["Amit Bashan"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "*"
+chrono = { version = "*", features = ["serde"] }
+const_format = { version = "*", features = ["const_generics"] }
+either = { version = "*", features = ["serde"] }
+rand = "*"
+reqwest = { version = "*", features = ["json"] }
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
+serde_with = "*"
+url = { version = "*", features = ["serde"] }
+uuid = { version = "*", features = ["serde", "v4"] }

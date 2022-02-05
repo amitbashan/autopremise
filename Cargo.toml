@@ -1,0 +1,21 @@
+[package]
+name = "autopremise"
+authors = ["Amit Bashan"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "*"
+chrono = "*"
+clap = { version = "*", features = ["derive"] }
+either = "*"
+futures = "*"
+itertools = "*"
+log = "*"
+log4rs = "*"
+premise = { path = "src/premise" }
+rand = "*"
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
+tokio = { version = "*", features = ["full"] }
