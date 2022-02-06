@@ -10,4 +10,5 @@ pub enum Type {
     GeoPoint,
     SelectOne,
     SelectMany,
+    Scanner,
 }

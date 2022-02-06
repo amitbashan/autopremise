@@ -5,6 +5,8 @@ pub mod command_line;
 
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
+    tracing_subscriber::fmt::init();
+
     let arguments = command_line::Arguments::parse();
     let configuration: configuration::Configuration = {
         use tokio::io::AsyncReadExt;
@@ -21,7 +23,6 @@ async fn main() -> tokio::io::Result<()> {
             user.automate().await.unwrap()
         }));
 
-    log4rs::init_file("src/configuration/log4rs.yaml", Default::default()).unwrap();
     futures::future::join_all(threads).await;
 
     Ok(())

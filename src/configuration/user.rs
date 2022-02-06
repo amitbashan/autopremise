@@ -1,4 +1,3 @@
-use log::{error, info};
 use premise::task::{self, Task};
 
 #[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
@@ -8,14 +7,11 @@ pub struct User {
 }
 
 impl User {
+    #[tracing::instrument(skip_all)]
     pub async fn automate(self) -> premise::result::Result<()> {
-        let client = premise::client::Client::new(self.refresh_token, self.location).await?;
+        let mut client = premise::client::Client::new(self.refresh_token, self.location).await?;
 
         loop {
-            if client.cache.tasks.is_empty() {
-                break;
-            }
-
             for task in &client.cache.tasks {
                 if task.title == "Update your Product ID preferences"
                     || task.requirements.len() > 0
@@ -25,21 +21,23 @@ impl User {
                     continue;
                 }
 
+                tracing::info!(r#"Submitting "{}"."#, task.title);
+
                 match task::survey::Survey(task.info.id.0.clone()).submit(&client).await {
                     Ok(_) => {
-                        info!(r#"Task "{}" submitted successfully."#, task.title);
+                        tracing::info!(r#"Task "{}" submitted successfully."#, task.title);
                     }
                     Err(error) => {
-                        error!(r#"Failed submitting "{}": {:#?}"#, task.title, error);
+                        tracing::error!(r#"Failed submitting "{}"."#, task.title);
+                        tracing::debug!("{:#?}", error);
                     }
                 }
 
                 tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
             }
 
-            client.user.sync().await?;
+            tokio::time::sleep(tokio::time::Duration::from_secs(18000)).await;
+            client.sync().await?;
         }
-
-        Ok(())
     }
 }
