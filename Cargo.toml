@@ -5,14 +5,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-async-trait = "*"
 chrono = "*"
 clap = { version = "*", features = ["derive"] }
-either = "*"
 futures = "*"
-itertools = "*"
 premise = { path = "src/premise" }
-rand = "*"
 serde = "*"
 serde_derive = "*"
 serde_json = "*"
