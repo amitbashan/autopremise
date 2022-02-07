@@ -10,6 +10,7 @@ use crate::{
     user::User,
 };
 
+#[derive(Debug)]
 pub struct Client {
     pub user: User,
     pub creation_time: Time,

@@ -1,7 +1,10 @@
 use clap::Parser;
+use futures::StreamExt;
 
 pub mod configuration;
 pub mod command_line;
+
+const MAXIMUM_USERS: usize = 5;
 
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
@@ -17,13 +20,19 @@ async fn main() -> tokio::io::Result<()> {
         file.read_to_string(&mut data).await?;
         serde_json::from_str(&data)?
     };
-    let threads = configuration.users
-        .into_iter()
-        .map(|user| tokio::spawn(async {
-            user.automate().await.unwrap()
-        }));
 
-    futures::future::join_all(threads).await;
+    futures::stream::iter(configuration.users)
+        .map(|user| tokio::spawn(async { user.automate().await }))
+        .buffer_unordered(MAXIMUM_USERS)
+        .for_each(|result| async {
+            match result {
+                Ok(Ok(client)) =>
+                    tracing::info!("Finished all tasks for user {}.", client.user.data.id),
+                Ok(Err(error)) =>
+                    tracing::error!(r#"Unexpected error occurred while automating user: {}"#, error.to_string()),
+                Err(error) => tracing::error!("{}", error.to_string())
+            }
+        }).await;
 
     Ok(())
 }

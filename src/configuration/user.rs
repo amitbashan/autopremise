@@ -9,40 +9,36 @@ pub struct User {
 
 impl User {
     #[tracing::instrument(skip_all)]
-    pub async fn automate(self) -> premise::result::Result<()> {
-        let mut client = premise::client::Client::new(
+    pub async fn automate(self) -> premise::result::Result<premise::client::Client> {
+        tracing::info!(r#"Creating client with token "{}"…"#, self.refresh_token);
+
+        let client = premise::client::Client::new(
             self.refresh_token,
             self.location,
             self.proxy.map(reqwest::Proxy::all).transpose()?,
         ).await?;
 
-        loop {
-            for task in &client.cache.tasks {
-                if task.title == "Update your Product ID preferences"
-                    || task.requirements.len() > 0
-                    || task.requires_travel
-                    || task.requires_photos
-                    || task.requires_screenshots {
-                    continue;
-                }
+        tracing::info!("Automating user {}…", client.user.data.id);
 
-                tracing::info!(r#"Submitting "{}"."#, task.title);
-
-                match task::survey::Survey(task.info.id.0.clone()).submit(&client).await {
-                    Ok(_) => {
-                        tracing::info!(r#"Task "{}" submitted successfully."#, task.title);
-                    }
-                    Err(error) => {
-                        tracing::error!(r#"Failed submitting "{}"."#, task.title);
-                        tracing::debug!("{:#?}", error);
-                    }
-                }
-
-                tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+        for task in &client.cache.tasks {
+            if task.title == "Update your Product ID preferences"
+                || task.requirements.len() > 0
+                || task.requires_travel
+                || task.requires_photos
+                || task.requires_screenshots {
+                continue;
             }
 
-            tokio::time::sleep(tokio::time::Duration::from_secs(18000)).await;
-            client.sync().await?;
+            tracing::info!(r#"Submitting "{}"."#, task.title);
+
+            match task::survey::Survey(task.info.id.0.clone()).submit(&client).await {
+                Ok(_) => tracing::info!(r#"Task "{}" submitted successfully."#, task.title),
+                Err(error) => tracing::error!(r#"Failed submitting "{}". Error: {}."#, task.title, error.to_string()),
+            }
+
+            tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
         }
+
+        Ok(client)
     }
 }
