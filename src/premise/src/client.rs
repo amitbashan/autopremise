@@ -17,8 +17,8 @@ pub struct Client {
 }
 
 impl Client {
-    pub async fn new(token: String, location: Location) -> result::Result<Self> {
-        let user = User::from_refresh_token(token, location).await?;
+    pub async fn new(token: String, location: Location, proxy: Option<reqwest::Proxy>) -> result::Result<Self> {
+        let user = User::from_refresh_token(token, location, proxy).await?;
         let cache = user.sync().await?;
 
         Ok(

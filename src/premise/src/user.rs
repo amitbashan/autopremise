@@ -21,7 +21,7 @@ pub struct User {
 }
 
 impl User {
-    pub async fn from_refresh_token(token: String, location: Location) -> result::Result<Self> {
+    pub async fn from_refresh_token(token: String, location: Location, proxy: Option<reqwest::Proxy>) -> result::Result<Self> {
         let mut headers = header::HeaderMap::new();
 
         headers.insert(header::ACCEPT_LANGUAGE, HeaderValue::from_str("en-US")?);
@@ -40,9 +40,14 @@ impl User {
 
         headers.insert(header::AUTHORIZATION, header::HeaderValue::try_from(&token)?);
 
-        let http_client = reqwest::Client::builder()
-            .default_headers(headers)
-            .build()?;
+        let client_builder = reqwest::Client::builder()
+            .default_headers(headers);
+        let http_client = match proxy {
+            None => client_builder.build()?,
+            Some(proxy) => client_builder
+                .proxy(proxy)
+                .build()?,
+        };
         let data = Data::new(&http_client).await?;
         let user = Self {
             token,

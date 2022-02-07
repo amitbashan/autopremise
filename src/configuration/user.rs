@@ -4,12 +4,17 @@ use premise::task::{self, Task};
 pub struct User {
     pub refresh_token: String,
     pub location: premise::api::location::Location,
+    pub proxy: Option<String>,
 }
 
 impl User {
     #[tracing::instrument(skip_all)]
     pub async fn automate(self) -> premise::result::Result<()> {
-        let mut client = premise::client::Client::new(self.refresh_token, self.location).await?;
+        let mut client = premise::client::Client::new(
+            self.refresh_token,
+            self.location,
+            self.proxy.map(reqwest::Proxy::all).transpose()?,
+        ).await?;
 
         loop {
             for task in &client.cache.tasks {
