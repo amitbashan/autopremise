@@ -2,8 +2,7 @@ use std::collections::HashMap;
 
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
-use rand::prelude::IteratorRandom;
-use rand::Rng;
+use rand::{prelude::IteratorRandom, Rng};
 use serde_json::Number;
 
 use crate::{
@@ -44,7 +43,7 @@ impl<'a> super::Task<&'a Vec<&'a InputGroup>> for Survey {
                 task: task.clone(),
             }
         });
-        let input_groups: Vec<&group::input::InputGroup> = reserved_task.task.form_localization.survey.contexts
+        let input_groups: Vec<_> = reserved_task.task.form_localization.survey.contexts
             .iter()
             .flat_map(|context| &context.input_groups)
             .collect();

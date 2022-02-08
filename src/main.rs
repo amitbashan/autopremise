@@ -22,12 +22,14 @@ async fn main() -> tokio::io::Result<()> {
     };
 
     futures::stream::iter(configuration.users)
-        .map(|user| tokio::spawn(async { user.automate().await }))
+        .map(|user| tokio::spawn(async {
+            user.automate().await
+        }))
         .buffer_unordered(MAXIMUM_USERS)
         .for_each(|result| async {
             match result {
                 Ok(Ok(client)) =>
-                    tracing::info!("Finished all tasks for user {}.", client.user.data.id),
+                    tracing::info!("Finished all tasks for user {} ({}).", client.user.data.id, client.user.data.email),
                 Ok(Err(error)) =>
                     tracing::error!(r#"Unexpected error occurred while automating user: {}"#, error.to_string()),
                 Err(error) => tracing::error!("{}", error.to_string())
