@@ -5,39 +5,39 @@ use crate::{
         location::Location,
         task,
         time::Time,
-    },
+	},
     result,
     user::User,
 };
 
 #[derive(Debug)]
 pub struct Client {
-    pub user: User,
-    pub creation_time: Time,
-    pub cache: task::sync::response::Body,
+	pub user: User,
+	pub creation_time: Time,
+	pub cache: task::sync::response::Body,
 }
 
 impl Client {
-    pub async fn new(token: String, location: Location, proxy: Option<reqwest::Proxy>) -> result::Result<Self> {
-        let user = User::from_refresh_token(token, location, proxy).await?;
-        let cache = user.sync().await?;
+	pub async fn new(token: String, location: Location, proxy: Option<reqwest::Proxy>) -> result::Result<Self> {
+		let user = User::from_refresh_token(token, location, proxy).await?;
+		let cache = user.sync().await?;
 
-        Ok(
-            Self {
-                user,
-                creation_time: Utc::now(),
-                cache,
-            }
-        )
-    }
+		Ok(
+			Self {
+				user,
+				creation_time: Utc::now(),
+				cache,
+			}
+		)
+	}
 
-    pub async fn sync(&mut self) -> result::Result<()> {
-        self.cache = self.user.sync().await?;
+	pub async fn sync(&mut self) -> result::Result<()> {
+		self.cache = self.user.sync().await?;
 
-        Ok(())
-    }
+		Ok(())
+	}
 
-    pub fn uptime(&self) -> Duration {
-        Utc::now() - self.creation_time
-    }
+	pub fn uptime(&self) -> Duration {
+		Utc::now() - self.creation_time
+	}
 }

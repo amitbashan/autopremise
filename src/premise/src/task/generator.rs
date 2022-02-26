@@ -1,5 +1,5 @@
 pub trait Generator<I> {
-    type Output;
+	type Output;
 
-    fn generate(input: I) -> Self::Output;
+	fn generate(input: I) -> Self::Output;
 }

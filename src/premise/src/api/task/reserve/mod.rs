@@ -6,24 +6,24 @@ pub mod request;
 pub mod response;
 
 pub async fn reserve(client: &reqwest::Client, body: &request::Body) -> reqwest::Result<response::Body> {
-    const ENDPOINT: &str = make_endpoint!(v2/tasks/reserve);
+	const ENDPOINT: &str = make_endpoint!(v2/tasks/reserve);
 
-    client.post(ENDPOINT)
-        .json(body)
-        .send()
-        .await?
-        .json()
-        .await
+	client.post(ENDPOINT)
+		.json(body)
+		.send()
+		.await?
+		.json()
+		.await
 }
 
 pub async fn sync(client: &reqwest::Client, info: Vec<reservation::Info>) -> reqwest::Result<reqwest::Response> {
-    const ENDPOINT: &str = make_endpoint!(v2/reservations/sync);
+	const ENDPOINT: &str = make_endpoint!(v2/reservations/sync);
 
-    client.put(ENDPOINT)
-        .json(&json!({
+	client.put(ENDPOINT)
+		.json(&json!({
 			"deletedReservationIds": Vec::<Number>::new(),
 			"reservations": info,
 		}))
-        .send()
-        .await
+		.send()
+		.await
 }

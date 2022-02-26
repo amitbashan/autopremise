@@ -7,13 +7,13 @@ pub mod response;
 pub struct Token(String);
 
 impl TryFrom<&Token> for HeaderValue {
-    type Error = InvalidHeaderValue;
+	type Error = InvalidHeaderValue;
 
-    fn try_from(token: &Token) -> Result<Self, Self::Error> {
-        let mut header = reqwest::header::HeaderValue::from_str(&format!("Bearer {}", token.0))?;
+	fn try_from(token: &Token) -> Result<Self, Self::Error> {
+		let mut header = reqwest::header::HeaderValue::from_str(&format!("Bearer {}", token.0))?;
 
-        header.set_sensitive(true);
+		header.set_sensitive(true);
 
-        Ok(header)
-    }
+		Ok(header)
+	}
 }

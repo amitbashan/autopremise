@@ -4,6 +4,6 @@ pub mod amount;
 
 #[derive(Debug, Clone, serde_derive::Serialize, serde_derive::Deserialize)]
 pub struct Price {
-    pub value: Number,
-    pub currency: Currency,
+	pub value: Number,
+	pub currency: Currency,
 }
