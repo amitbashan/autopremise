@@ -14,7 +14,7 @@ impl User {
 	pub async fn automate(self) -> premise::result::Result<premise::client::Client> {
 		tracing::info!(r#"Creating client with token "{}"…"#, self.refresh_token);
 
-		let client = premise::client::Client::new(
+		let mut client = premise::client::Client::new(
 			self.refresh_token,
 			self.location,
 			self.proxy.map(reqwest::Proxy::all).transpose()?,
@@ -54,6 +54,8 @@ impl User {
 					3600 * hours,
 				)
 			).await;
+
+			client.cache = client.user.sync().await?;
 		}
 
 		Ok(client)

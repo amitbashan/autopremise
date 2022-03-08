@@ -1,13 +1,13 @@
 use chrono::{Duration, Utc};
 
 use crate::{
-    api::{
-        location::Location,
-        task,
-        time::Time,
+	api::{
+		location::Location,
+		task,
+		time::Time,
 	},
-    result,
-    user::User,
+	result,
+	user::User,
 };
 
 #[derive(Debug)]
@@ -29,12 +29,6 @@ impl Client {
 				cache,
 			}
 		)
-	}
-
-	pub async fn sync(&mut self) -> result::Result<()> {
-		self.cache = self.user.sync().await?;
-
-		Ok(())
 	}
 
 	pub fn uptime(&self) -> Duration {

@@ -23,13 +23,14 @@ impl<'a> super::Task<&'a Vec<&'a InputGroup>> for Survey {
 	async fn submit(&self, client: &Client) -> result::Result<()> {
 		let reserved_task = client.user.reserve(self.id().clone()).await?.reserved_tasks
 			.into_iter().next().unwrap_or({
-			let (reservation, task) = client.cache.reservations
+			let response = client.user.sync().await?;
+			let (reservation, task) = response.reservations
 				.iter()
 				.find_map(|reservation| {
 					if &reservation.info.id.0 == self.id() {
 						Some((
 							reservation,
-							client.cache.task_configurations
+							response.task_configurations
 								.iter()
 								.find(|configuration| &configuration.id == self.id())?
 						))
